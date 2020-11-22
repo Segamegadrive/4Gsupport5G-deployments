@@ -32,7 +32,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: 4g-hss-service
+  name: hss-service
 spec:
   selector:
     app: hss-deployment
