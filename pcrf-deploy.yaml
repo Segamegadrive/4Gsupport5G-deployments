@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 4g-hss
+  name: 4g-pcrf
 spec:
   selector:
     matchLabels:
-      app: hss-deployment
+      app: pcrf-deployment
   replicas: 1
   template:
     metadata:
       labels:
-        app: hss-deployment
+        app: pcrf-deployment
     spec:
       containers:
-        - name: hss-pod
+        - name: pcrf-pod
           image: robjspencer/endccore:latest
           env:
             - name: MONGODB_HOSTNAME
@@ -22,9 +22,9 @@ spec:
               value: "pgw-diameter-service"
             - name: LD_LIBRARY_PATH
               value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
-          command: ["/usr/local/bin/hss.sh"]
+          command: ["/usr/local/bin/pcrf.sh"]
           ports:
-            - name: hss-port
+            - name: pcrf-port
               containerPort: 3868
       initContainers:
       - name: mongodb-to-start-first
@@ -36,12 +36,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hss-service
+  name: pcrf-service
 spec:
   selector:
-    app: hss-deployment
+    app: pcrf-deployment
   ports:
-    - name: hss-port
+    - name: pcrf-port
       protocol: TCP
       port: 3868
       targetPort: 3868
