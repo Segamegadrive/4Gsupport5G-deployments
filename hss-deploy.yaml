@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 4g-hss
+spec:
+  selector:
+    matchLabels:
+      app: hss-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hss-deployment
+    spec:
+      containers:
+        - name: hss-pod
+          image: robjspencer/endccore:latest
+          env:
+            - name: MONGODB_HOSTNAME
+              value: mongodb-service
+            - name: PGW_HOSTNAME
+              value: "pgw-diameter-service"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: ["/usr/bin/hss.sh"]
+          ports:
+            - name: hss-port
+              containerPort: 3868
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: 4g-hss-service
+spec:
+  selector:
+    app: hss-deployment
+  ports:
+    - name: hss-port
+      protocol: TCP
+      port: 3868
+      targetPort: 3868
+  type: NodePort
