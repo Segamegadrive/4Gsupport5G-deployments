@@ -34,4 +34,35 @@ spec:
       - name: mongodb-to-start-first
         image: busybox
         command: ["sh", "-c", "until nslookup mongodb-service; do echo Letting mongoDB to start first; sleep 2; done;"]
-        
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgw-gtpc-service
+spec:
+  selector:
+    app: sgw-deployment
+  ports:
+    - name: gtpc-port
+      protocol: UDP
+      port: 2123
+      targetPort: 2123
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgw-gtpu-service
+spec:
+  selector:
+    app: sgw-deployment
+  ports:
+    - name: gtpu-port
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+  type: LoadBalancer
