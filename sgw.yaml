@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 4g-sgw
+spec:
+  selector:
+    matchLabels:
+      app: sgw-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sgw-deployment
+    spec:
+      containers:
+        - name: sgw-pod
+          image: robjspencer/endccore:latest
+          env:
+            - name: PCRF_HOSTNAME
+              value: pcrf-service
+            - name: SGW_ADDR
+              value: sgw-gtpc-service
+            - name: S1U_ADDR
+              value: 
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: ["/usr/bin/sgw.sh"]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: gtpu-port
+              containerPort: 2152
+      initContainers:
+      - name: mongodb-to-start-first
+        image: busybox
+        command: ["sh", "-c", "until nslookup mongodb-service; do echo Letting mongoDB to start first; sleep 2; done;"]
+        
