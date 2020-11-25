@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 4g-hss
+  name: 4g-hss-test4
 spec:
   selector:
     matchLabels:
@@ -22,7 +22,7 @@ spec:
               value: "pgw-diameter-service"
             - name: LD_LIBRARY_PATH
               value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
-          command: ["/usr/local/bin/hss.sh"]
+          command: ["/usr/bin/hss.sh"]
           ports:
             - name: hss-port
               containerPort: 3868
@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hss-service
+  name: hss-service-4
 spec:
   selector:
     app: hss-deployment
