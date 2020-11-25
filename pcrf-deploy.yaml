@@ -22,7 +22,7 @@ spec:
               value: "pgw-diameter-service"
             - name: LD_LIBRARY_PATH
               value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
-          command: ["/usr/local/bin/pcrf.sh"]
+          command: ["/usr/bin/pcrf.sh"]
           ports:
             - name: pcrf-port
               containerPort: 3868
