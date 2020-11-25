@@ -21,7 +21,7 @@ spec:
             - name: SGW_ADDR
               value: sgw-gtpc-service
             - name: S1U_ADDR
-              value: 
+              value: 10.5.60.25
             - name: LD_LIBRARY_PATH
               value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
           command: ["/usr/bin/sgw.sh"]
