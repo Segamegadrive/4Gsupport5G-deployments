@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 4g-pgw
+spec:
+  selector:
+    matchLabels:
+      app: pgw-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pgw-deployment
+    spec:
+      containers:
+        - name: pgw-pod 
+          image: robjspencer/endccore:latest
+          env:
+            - name: PCRF_HOSTNAME
+              value: pcrf-service
+            - name: UE_POOL_SUBNET
+              value: "<ADD IP SUBNET>"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: ["/usr/bin/pgw.sh"]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: gtpu-port
+              containerPort: 2152
+            - name: daimeter-port
+              containerPort: 3868
+      initContainers:
+      - name: mongodb-to-start-first
+        image: busybox
+        command: ["sh", "-c", "until nslookup mongodb-service; do echo Letting mongoDB to start first; sleep 2; done;"]
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgw-diameter-service
+spec:
+  selector:
+    app: pgw-deployment
+  ports:
+    - name: diameter-port
+      protocol: TCP
+      port: 3868
+      targetPort: 3868
+  type: NodePort
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgw-gtpu-service
+spec:
+  selector:
+    app: pgw-deployment
+  ports:
+    - name: gtpu-port
+      port: 2152
+      targetPort: 2152
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgw-gtpc-service
+spec: 
+  selector:
+    app: pgw-deployment
+  ports:
+    - name: gtpc-port
+      protocol: UDP
+      port: 2123
+      targetPort: 2123
+  type: NodePort
