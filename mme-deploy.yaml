@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 4g-mme
+spec:
+  selector:
+    matchLabels:
+      app: mme-deployment
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mme-deployment
+    spec:
+      containers:
+        - name: mme-pod
+          image: robjspencer/endccore:latest
+          env:
+            - name: HSS_HOSTNAME
+              value: hss-service
+            - name: MCC
+              value: "235"
+            - name: MNC
+              value: "93"
+            - name: TAC_LIST
+              value: "4040"
+            - name: SGW_HOSTNAME
+              value: sgw-gtpc-service
+            - name: PGW_HOSTNAME
+              value: pgw-gtpc-service 
+            - name: FULL_NETWORK_NAME
+              value: "5GIC"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: ["/usr/bin/mme.sh"]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: s1ap-port
+              protocol: "SCTP"
+              containerPort: 36412
+            - name: diameter-port
+              containerPort: 3868
+      initContainers:
+      - name: waiting-for-hss-to-start-first
+        image: busybox
+        command: ["sh", "-c", "sleep 15; until nslookup hss-service; do echo waiting for hss to start first; sleep 2; done;"]
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme-gtpc-service
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+    - name: gtpc-port
+      protocol: UDP
+      port: 2123
+      targetPort: 2123
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme-s1ap-service
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+    - name: s1ap-port
+      protocol: SCTP
+      port: 36412
+      targetPort: 36412
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme-diameter-service
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+    - name: diameter-port
+      protocol: TCP
+      port: 3868
+      targetPort: 3868
+  type: NodePort
