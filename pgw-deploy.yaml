@@ -19,7 +19,7 @@ spec:
             - name: PCRF_HOSTNAME
               value: pcrf-service
             - name: UE_POOL_SUBNET
-              value: "<ADD IP SUBNET>"
+              value: "10.10.0.1/16"
             - name: LD_LIBRARY_PATH
               value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
           command: ["/usr/bin/pgw.sh"]
@@ -28,7 +28,7 @@ spec:
               containerPort: 2123
             - name: gtpu-port
               containerPort: 2152
-            - name: daimeter-port
+            - name: diameter-port
               containerPort: 3868
       initContainers:
       - name: mongodb-to-start-first
